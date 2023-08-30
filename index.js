@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 5000;
+const PORT =process.env.PORT||5000;
 const userRoutes = require("./Routes/users");
 const loginRoutes=require("./Routes/login")
 const GroupRoutes=require("./Routes/Group")
