@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Rgroup = require("../Database/Modal/Rgroup");
+const Staff=require("../Database/Modal/Staff")
 const ConnectMongo = require("../Database/conn");
 
 
@@ -37,6 +38,7 @@ router.get("/", async (req, res) => {
   try {
     // Find posts by userId
     const posts = await Rgroup.find({ userId });
+    console.log("posts", posts);
     let data = [];
     if (posts.length > 0) {
       for (const post of posts) {
