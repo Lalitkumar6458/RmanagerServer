@@ -105,24 +105,24 @@ router.post("/", async (req, res) => {
    res.status(500).json({ error: "Error registering user" });
  }
 })
-router.get("/", async (req, res) => {
-      const { userId, groupId } = req.query;
-      console.log("groupId", groupId);
-      try {
-        // Find posts by userId
-        const posts = await Staff.find({ userId, groupId });
+  router.get("/", async (req, res) => {
+        const { userId, groupId } = req.query;
+        console.log("groupId", groupId);
+        try {
+          // Find posts by userId
+          const posts = await Staff.find({ userId, groupId });
 
-        if (posts.length > 0) {
-          res.status(200).json({ data: posts });
-        } else {
-          res
-            .status(404)
-            .json({ error: "No posts found for the user", data: [] });
+          if (posts.length > 0) {
+            res.status(200).json({ data: posts });
+          } else {
+            res
+              .status(404)
+              .json({ error: "No posts found for the user", data: [] });
+          }
+        } catch (error) {
+          res.status(500).json({ error: "Error retrieving posts", data: [] });
         }
-      } catch (error) {
-        res.status(500).json({ error: "Error retrieving posts", data: [] });
-      }
-});
+  });
 router.put("/", async (req, res) => {
      const { id, groupId, userId, staffname, category, staffemail } = req.body;
      try {

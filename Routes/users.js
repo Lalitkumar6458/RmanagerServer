@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const User = require('../Database/Modal/user')
 const ConnectMongo = require("../Database/conn");
+const User = require('../Database/Modal/user')
 // Create a new user
 
 ConnectMongo();
