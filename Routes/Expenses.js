@@ -29,14 +29,19 @@ router.get("/", async (req, res) => {
   try {
     // Find posts by userId
     let Expense = [];
+    let TotalAmount=0
     if (staffId == "null") {
       Expense = await Expenses.find({ userId, groupId }).sort({ date: -1 }).limit(10);
+      TotalAmount = await Expenses.find({ userId, groupId }).sort({ date: -1 });
     } else {
-      Expense = await Expenses.find({ userId, groupId, staffId }).sort({ date: -1 }).limit(10);
+      Expense = await Expenses.find({ userId, groupId, staffId }).sort({ date: -1 });
+      TotalAmount = Expense;
     }
+     
+
 
     if (Expense.length > 0) {
-      const totalExpenseAmount = Expense.reduce(
+      const totalExpenseAmount = TotalAmount.reduce(
         (total, post) => total + post.Expense,
         0
       );
