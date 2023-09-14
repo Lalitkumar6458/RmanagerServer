@@ -9,6 +9,7 @@ const StaffRoutes = require("./Routes/Staff");
 const ExpensesRoutes = require("./Routes/Expenses");
 const StaffLoginRoutes = require("./Routes/StaffLogin");
 const FilterExpensesRoutes = require("./Routes/FIlterExpenses");
+const GroupWiseData=require("./Routes/CategoryStaff")
 
 const cors = require("cors");
 app.use(express.json());
@@ -21,6 +22,8 @@ app.use("/Staff", StaffRoutes);
 app.use("/Expenses", ExpensesRoutes);
 app.use("/StaffLogin", StaffLoginRoutes);
 app.use("/FilterExpenses", FilterExpensesRoutes);
+app.use("/groupwise-expenses", GroupWiseData);
+
 
 
 

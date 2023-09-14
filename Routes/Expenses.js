@@ -26,18 +26,55 @@ router.get("/", async (req, res) => {
   console.log("req.query", req.query);
   const { userId, groupId, staffId } = req.query;
   console.log("groupId", groupId);
+  const newDate = new Date();
+      let startDate = new Date(
+        newDate.toISOString().split("T")[0].split("-")[0] +
+          "-" +
+          newDate.toISOString().split("T")[0].split("-")[1] +
+          "-" +
+          "01"
+      );
+      let endDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        0
+      );
+      endDate.setHours(23, 59, 59, 999);
   try {
     // Find posts by userId
     let Expense = [];
     let TotalAmount=0
     if (staffId == "null") {
       Expense = await Expenses.find({ userId, groupId }).sort({ date: -1 }).limit(10);
-      TotalAmount = await Expenses.find({ userId, groupId }).sort({ date: -1 });
+      
+
+      TotalAmount = await Expenses.find({
+        userId,
+        groupId,
+        date: {
+          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
+          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
+        },
+      }).sort({ date: -1 });
     } else {
       Expense = await Expenses.find({ userId, groupId, staffId }).sort({ date: -1 });
-      TotalAmount = Expense;
+      TotalAmount = await Expenses.find({
+        userId,
+        groupId,
+        staffId,
+        date: {
+          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
+          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
+        },
+      }).sort({
+        date: -1,
+      });
+
     }
      
+    const totalStaff = await Expenses.find({ userId, groupId, staffId }).sort({
+      date: -1,
+    });
 
 
     if (Expense.length > 0) {
