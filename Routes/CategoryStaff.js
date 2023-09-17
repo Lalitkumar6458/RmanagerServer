@@ -30,7 +30,8 @@ router.get("/", async (req, res) => {
 let staffEx = {
   totalEx: 0,
   staffname: staff.staffname,
-  CategoryWise:{},
+  staffId: staffId,
+  CategoryWise: {},
 };
 
 let catObj={
