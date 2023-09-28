@@ -72,24 +72,48 @@ router.get("/", async (req, res) => {
 
     }
      
-    const totalStaff = await Expenses.find({ userId, groupId, staffId }).sort({
-      date: -1,
-    });
-
 
     if (Expense.length > 0) {
+const categoryTotal = {};
+
+// Initialize the grand total
+let grandTotal = 0;
+
+// Iterate through the input data to determine unique categories and calculate totals
+TotalAmount.forEach((item) => {
+  const category = item.category;
+  const expense = item.Expense;
+
+  if (!categoryTotal[category]) {
+    categoryTotal[category] = 0;
+  }
+
+  categoryTotal[category] += expense;
+  grandTotal += expense;
+});
+
+// Output the category-wise total expenses and the grand total
+const outputData = {
+  categoryTotal,
+  grandTotal,
+};
+
+console.log(outputData, "outputData");
       const totalExpenseAmount = TotalAmount.reduce(
         (total, post) => total + post.Expense,
         0
       );
       console.log("totalExpenseAmount", totalExpenseAmount);
-      res
-        .status(200)
-        .json({ data: Expense, totalExpenseGroupAmount: totalExpenseAmount });
+      res.status(200).json({
+        data: Expense,
+        totalExpenseGroupAmount: totalExpenseAmount,
+        TotalData: outputData,
+      });
     } else {
       res.status(404).json({ error: "No posts found for the user", data: [] });
     }
   } catch (error) {
+    console.log("eeror",error)
     res.status(500).json({ error: "Error retrieving posts", data: [] });
   }
 

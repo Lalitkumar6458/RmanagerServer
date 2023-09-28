@@ -20,11 +20,11 @@ router.get("/", async (req, res) => {
 
     // Find staff members for the specified group
     const staffMembers = await Staff.find({userId, groupId });
-
+console
     // Calculate total expenses by category for this group
     const categoryExpenses = [];
-const GruopByMap = staffMembers.groupBy((item) => item.category);
-console.log("GruopByMap", GruopByMap);
+// const GruopByMap = staffMembers.groupBy((item) => item.category);
+// console.log("GruopByMap", GruopByMap);
 
     for (const staff of staffMembers) {
        
@@ -60,7 +60,6 @@ categoryExpenses.push(staffEx);
     }
 
     // Send the result to the frontend
-    console.log(categoryExpenses, "categoryExpenses");
     res.status(200).json({
       groupName: group.groupname,
       groupExpenses: categoryExpenses,
