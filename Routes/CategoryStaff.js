@@ -23,7 +23,13 @@ router.get("/", async (req, res) => {
 
     // Calculate total expenses by category for this group
     const categoryExpenses = [];
+const GruopByMap = staffMembers.groupBy((item) => item.category);
+console.log("GruopByMap", GruopByMap);
+
     for (const staff of staffMembers) {
+       
+
+
         let staffId=staff._id.toString()
         let category = staff.category;
    const staffdataex = await Expenses.find({ staffId, groupId });
