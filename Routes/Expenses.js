@@ -22,121 +22,93 @@ router.post("/", async (req, res) => {
    res.status(500).json({ error: "Error registering user" });
  }
 })
+
 router.get("/", async (req, res) => {
-  console.log("req.query", req.query);
-  const { userId, groupId, staffId } = req.query;
-  console.log("groupId", groupId);
-  const newDate = new Date();
-      let startDate = new Date(
-        newDate.toISOString().split("T")[0].split("-")[0] +
-          "-" +
-          newDate.toISOString().split("T")[0].split("-")[1] +
-          "-" +
-          "01"
-      );
-      let endDate = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth() + 1,
-        0
-      );
-      endDate.setHours(23, 59, 59, 999);
   try {
-    // Find posts by userId
-    let Expense = [];
-    let TotalAmount=0
-    if (staffId == "null") {
-      Expense = await Expenses.find({
-        userId,
-        groupId,
-        date: {
-          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
-          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
-        },
-      })
-        .sort({ date: -1 })
-        .limit(10);
-      
+    const { userId, groupId, staffId } = req.query;
+    console.log("req.query", req.query);
 
-      TotalAmount = await Expenses.find({
-        userId,
-        groupId,
-        date: {
-          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
-          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
-        },
-      }).sort({ date: -1 });
-    } else {
-      Expense = await Expenses.find({
-        userId,
-        groupId,
-        staffId,
-        date: {
-          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
-          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
-        },
-      }).sort({ date: -1 });
-      TotalAmount = await Expenses.find({
-        userId,
-        groupId,
-        staffId,
-        date: {
-          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
-          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
-        },
-      }).sort({
-        date: -1,
-      });
+    const newDate = new Date();
+    const startDate = new Date(
+      newDate.getFullYear(),
+      newDate.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0
+    );
+    const endDate = new Date(
+      newDate.getFullYear(),
+      newDate.getMonth() + 1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ); // Ends at midnight of the next month
 
+    let expensesQuery = {
+      userId,
+      groupId,
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    };
+
+    if (staffId !== "null") {
+      expensesQuery.staffId = staffId;
     }
-     
+
+    const Expense = await Expenses.find(expensesQuery)
+      .sort({ date: -1 })
+      .limit(10);
+    const TotalAmount = await Expenses.find(expensesQuery).sort({ date: -1 });
 
     if (Expense.length > 0) {
-const categoryTotal = {};
+      const categoryTotal = {};
+      let grandTotal = 0;
 
-// Initialize the grand total
-let grandTotal = 0;
+      TotalAmount.forEach((item) => {
+        const category = item.category;
+        const expense = item.Expense;
 
-// Iterate through the input data to determine unique categories and calculate totals
-TotalAmount.forEach((item) => {
-  const category = item.category;
-  const expense = item.Expense;
+        if (!categoryTotal[category]) {
+          categoryTotal[category] = 0;
+        }
 
-  if (!categoryTotal[category]) {
-    categoryTotal[category] = 0;
-  }
+        categoryTotal[category] += expense;
+        grandTotal += expense;
+      });
 
-  categoryTotal[category] += expense;
-  grandTotal += expense;
-});
+      const outputData = {
+        categoryTotal,
+        grandTotal,
+      };
 
-// Output the category-wise total expenses and the grand total
-const outputData = {
-  categoryTotal,
-  grandTotal,
-};
-
-console.log(outputData, "outputData");
+      console.log(outputData, "outputData");
       const totalExpenseAmount = TotalAmount.reduce(
         (total, post) => total + post.Expense,
         0
       );
       console.log("totalExpenseAmount", totalExpenseAmount);
-      res
-        .status(200)
-        .json({
-          data: Expense,
-          totalExpenseGroupAmount: totalExpenseAmount,
-          TotalData: outputData,
-        });
+
+      res.status(200).json({
+        data: Expense,
+        totalExpenseGroupAmount: totalExpenseAmount,
+        TotalData: outputData,
+      });
     } else {
       res.status(404).json({ error: "No posts found for the user", data: [] });
     }
   } catch (error) {
-    console.log("eeror",error)
+    console.log("error", error);
     res.status(500).json({ error: "Error retrieving posts", data: [] });
   }
-
 });
+
+
 router.put("/", async (req, res) => {
     const { id, Expense, date, staffname, category, node } = req.body;
     try {
