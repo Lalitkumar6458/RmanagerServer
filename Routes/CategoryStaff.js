@@ -9,7 +9,16 @@ const Expenses = require("../Database/Modal/Expenses");
 // Define a route to get group-wise staff data and calculate total expenses by category
 router.get("/", async (req, res) => {
    const { userId, groupId } = req.query;
-
+  const newDate = new Date();
+  let startDate = new Date(
+    newDate.toISOString().split("T")[0].split("-")[0] +
+      "-" +
+      newDate.toISOString().split("T")[0].split("-")[1] +
+      "-" +
+      "01"
+  );
+  let endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+  endDate.setHours(23, 59, 59, 999);
   try {
     // Find the group based on the provided groupId
     let group = await Rgroup.find({ groupId, userId });
@@ -32,7 +41,14 @@ console
 
         let staffId=staff._id.toString()
         let category = staff.category;
-   const staffdataex = await Expenses.find({ staffId, groupId });
+   const staffdataex = await Expenses.find({
+     staffId,
+     groupId,
+     date: {
+       $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
+       $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
+     },
+   });
 let staffEx = {
   totalEx: 0,
   staffname: staff.staffname,

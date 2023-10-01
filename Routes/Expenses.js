@@ -45,7 +45,16 @@ router.get("/", async (req, res) => {
     let Expense = [];
     let TotalAmount=0
     if (staffId == "null") {
-      Expense = await Expenses.find({ userId, groupId }).sort({ date: -1 }).limit(10);
+      Expense = await Expenses.find({
+        userId,
+        groupId,
+        date: {
+          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
+          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
+        },
+      })
+        .sort({ date: -1 })
+        .limit(10);
       
 
       TotalAmount = await Expenses.find({
@@ -57,7 +66,15 @@ router.get("/", async (req, res) => {
         },
       }).sort({ date: -1 });
     } else {
-      Expense = await Expenses.find({ userId, groupId, staffId }).sort({ date: -1 });
+      Expense = await Expenses.find({
+        userId,
+        groupId,
+        staffId,
+        date: {
+          $gte: new Date(startDate.toISOString().split("T")[0]).toISOString(),
+          $lte: new Date(endDate.toISOString().split("T")[0]).toISOString(),
+        },
+      }).sort({ date: -1 });
       TotalAmount = await Expenses.find({
         userId,
         groupId,
@@ -104,11 +121,13 @@ console.log(outputData, "outputData");
         0
       );
       console.log("totalExpenseAmount", totalExpenseAmount);
-      res.status(200).json({
-        data: Expense,
-        totalExpenseGroupAmount: totalExpenseAmount,
-        TotalData: outputData,
-      });
+      res
+        .status(200)
+        .json({
+          data: Expense,
+          totalExpenseGroupAmount: totalExpenseAmount,
+          TotalData: outputData,
+        });
     } else {
       res.status(404).json({ error: "No posts found for the user", data: [] });
     }
