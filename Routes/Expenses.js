@@ -24,10 +24,10 @@ router.post("/", async (req, res) => {
 })
 
 router.get("/", async (req, res) => {
+  let Expense=[]
   try {
     const { userId, groupId, staffId } = req.query;
     console.log("req.query", req.query);
-
     const newDate = new Date();
     const startDate = new Date(
       newDate.getFullYear(),
@@ -59,11 +59,16 @@ router.get("/", async (req, res) => {
 
     if (staffId !== "null") {
       expensesQuery.staffId = staffId;
+        Expense = await Expenses.find(expensesQuery)
+            .sort({ date: -1 })
+    }else{
+         Expense = await Expenses.find(expensesQuery)
+            .sort({ date: -1 })
+            .limit(10);
     }
 
-    const Expense = await Expenses.find(expensesQuery)
-      .sort({ date: -1 })
-      .limit(10);
+
+
     const TotalAmount = await Expenses.find(expensesQuery).sort({ date: -1 });
 
     if (Expense.length > 0) {
@@ -87,12 +92,12 @@ router.get("/", async (req, res) => {
         grandTotal,
       };
 
-      console.log(outputData, "outputData");
+
       const totalExpenseAmount = TotalAmount.reduce(
         (total, post) => total + post.Expense,
         0
       );
-      console.log("totalExpenseAmount", totalExpenseAmount);
+  
 
       res.status(200).json({
         data: Expense,
